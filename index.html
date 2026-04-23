@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI Chess Solver — Two AI agents play chess autonomously using Minimax with Alpha-Beta Pruning. Watch them learn, compete, and solve complex positions.">
+    <title>AI Chess Solver — Autonomous Chess AI Agents</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <canvas id="particles-canvas"></canvas>
+
+    <!-- Header -->
+    <header id="app-header">
+        <div class="header-inner">
+            <div class="logo-group">
+                <div class="logo-icon">♚</div>
+                <div class="logo-text">
+                    <h1>AI Chess Solver</h1>
+                    <span class="logo-subtitle">Minimax · Alpha-Beta · Autonomous Agents</span>
+                </div>
+            </div>
+            <div class="header-stats">
+                <div class="header-stat">
+                    <span class="stat-label">Matches</span>
+                    <span class="stat-value" id="total-matches">0</span>
+                </div>
+                <div class="header-stat">
+                    <span class="stat-label">Moves</span>
+                    <span class="stat-value" id="total-moves-stat">0</span>
+                </div>
+                <div class="header-stat">
+                    <span class="stat-label">Nodes</span>
+                    <span class="stat-value" id="total-nodes-stat">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="app-main">
+        <!-- Agent Config Bar -->
+        <section class="agent-config-bar" id="agent-config-bar">
+            <div class="agent-card white-agent-card">
+                <div class="agent-avatar white-avatar">♔</div>
+                <div class="agent-info">
+                    <span class="agent-title">Agent White</span>
+                    <span class="agent-type" id="white-agent-type">Aggressive · Depth 4</span>
+                </div>
+                <div class="agent-score-display">
+                    <span class="agent-wins" id="white-wins">0</span>
+                    <span class="agent-wins-label">wins</span>
+                </div>
+            </div>
+            <div class="vs-badge">VS</div>
+            <div class="agent-card black-agent-card">
+                <div class="agent-avatar black-avatar">♚</div>
+                <div class="agent-info">
+                    <span class="agent-title">Agent Black</span>
+                    <span class="agent-type" id="black-agent-type">Positional · Depth 4</span>
+                </div>
+                <div class="agent-score-display">
+                    <span class="agent-wins" id="black-wins">0</span>
+                    <span class="agent-wins-label">wins</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Main Game Area -->
+        <div class="game-layout">
+            <!-- Left: Board -->
+            <div class="board-col">
+                <div class="board-wrapper">
+                    <div class="board-coords-col" id="rank-labels"></div>
+                    <div id="chess-board" class="chess-board"></div>
+                    <div class="board-coords-row" id="file-labels"></div>
+                    <div class="turn-indicator" id="turn-indicator">
+                        <div class="turn-dot"></div>
+                        <span id="turn-text">White thinking...</span>
+                    </div>
+                </div>
+                <!-- Controls -->
+                <div class="controls-bar">
+                    <button class="ctrl-btn ctrl-primary" id="btn-start">
+                        <span class="ctrl-icon">▶</span> Start Match
+                    </button>
+                    <button class="ctrl-btn" id="btn-pause" disabled>
+                        <span class="ctrl-icon">⏸</span> Pause
+                    </button>
+                    <button class="ctrl-btn" id="btn-reset">
+                        <span class="ctrl-icon">↺</span> Reset
+                    </button>
+                    <div class="speed-control">
+                        <span class="speed-label">Speed</span>
+                        <input type="range" id="speed-slider" min="0" max="4" value="2" class="speed-slider">
+                        <span class="speed-value" id="speed-value">500ms</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Panels -->
+            <div class="panels-col">
+                <!-- Agent Settings -->
+                <div class="panel-card" id="settings-card">
+                    <h2 class="panel-title">Agent Configuration</h2>
+                    <div class="agent-settings-row">
+                        <div class="agent-setting">
+                            <label class="setting-label">♔ White Agent</label>
+                            <select class="setting-select" id="white-strategy">
+                                <option value="aggressive">Aggressive</option>
+                                <option value="positional">Positional</option>
+                                <option value="defensive">Defensive</option>
+                                <option value="random">Random (Baseline)</option>
+                            </select>
+                            <select class="setting-select" id="white-depth">
+                                <option value="2">Depth 2 (Fast)</option>
+                                <option value="3">Depth 3</option>
+                                <option value="4" selected>Depth 4 (Standard)</option>
+                                <option value="5">Depth 5 (Strong)</option>
+                                <option value="6">Depth 6 (Expert)</option>
+                            </select>
+                        </div>
+                        <div class="agent-setting">
+                            <label class="setting-label">♚ Black Agent</label>
+                            <select class="setting-select" id="black-strategy">
+                                <option value="aggressive">Aggressive</option>
+                                <option value="positional" selected>Positional</option>
+                                <option value="defensive">Defensive</option>
+                                <option value="random">Random (Baseline)</option>
+                            </select>
+                            <select class="setting-select" id="black-depth">
+                                <option value="2">Depth 2 (Fast)</option>
+                                <option value="3">Depth 3</option>
+                                <option value="4" selected>Depth 4 (Standard)</option>
+                                <option value="5">Depth 5 (Strong)</option>
+                                <option value="6">Depth 6 (Expert)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="setting-label">Auto-Rematch</label>
+                        <div class="toggle-row">
+                            <label class="toggle">
+                                <input type="checkbox" id="auto-rematch" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                            <span class="toggle-label">Play continuous matches</span>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="setting-label">Load Position (FEN)</label>
+                        <div class="fen-row">
+                            <input type="text" class="fen-input" id="fen-input" placeholder="Paste FEN..." value="">
+                            <button class="btn-sm" id="btn-load-fen">Load</button>
+                        </div>
+                        <div class="preset-puzzles">
+                            <button class="puzzle-chip" data-fen="r1bqkb1r/pppp1ppp/2n2n2/4p2Q/2B1P3/8/PPPP1PPP/RNB1K1NR w KQkq - 4 4">Scholar's Mate</button>
+                            <button class="puzzle-chip" data-fen="6k1/5ppp/8/8/8/8/r4PPP/1R4K1 w - - 0 1">Back Rank</button>
+                            <button class="puzzle-chip" data-fen="r3k2r/ppp2ppp/2n5/3Np1q1/2B5/1P6/P1P2PPP/R2QK2R w KQkq - 0 1">Fried Liver</button>
+                            <button class="puzzle-chip" data-fen="rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1">Starting Pos</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Evaluation -->
+                <div class="panel-card">
+                    <h2 class="panel-title">Live Evaluation</h2>
+                    <div class="eval-bar-wide">
+                        <div class="eval-bar-white" id="eval-bar-white" style="width:50%"></div>
+                        <div class="eval-bar-black" id="eval-bar-black" style="width:50%"></div>
+                        <span class="eval-label-left">White</span>
+                        <span class="eval-label-right">Black</span>
+                        <span class="eval-center" id="eval-center">0.0</span>
+                    </div>
+                    <div class="engine-stats">
+                        <div class="stat-row"><span>Current turn</span><span id="stat-turn">White</span></div>
+                        <div class="stat-row"><span>Move #</span><span id="stat-move-num">0</span></div>
+                        <div class="stat-row"><span>Nodes (last)</span><span id="stat-nodes">0</span></div>
+                        <div class="stat-row"><span>Time (last)</span><span id="stat-time">0ms</span></div>
+                        <div class="stat-row"><span>Best score</span><span id="stat-score">0</span></div>
+                    </div>
+                </div>
+
+                <!-- Move History -->
+                <div class="panel-card">
+                    <h2 class="panel-title">Move History</h2>
+                    <div class="move-list" id="move-list">
+                        <div class="move-list-empty">Waiting for match to start...</div>
+                    </div>
+                </div>
+
+                <!-- Match Log -->
+                <div class="panel-card">
+                    <h2 class="panel-title">Match Log</h2>
+                    <div class="match-log" id="match-log">
+                        <div class="move-list-empty">No matches played yet.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Game Over Overlay -->
+    <div class="gameover-overlay" id="gameover-overlay" style="display:none;">
+        <div class="gameover-banner">
+            <span class="gameover-icon" id="go-icon">♔</span>
+            <span class="gameover-text" id="go-text">White wins by checkmate!</span>
+            <span class="gameover-sub" id="go-sub">Starting next match...</span>
+        </div>
+    </div>
+
+    <script src="chess-engine.js"></script>
+    <script src="chess-ai.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
