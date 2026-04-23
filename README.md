@@ -74,7 +74,7 @@ AI-Chess-Solver/
 
 Open `index.html` in any modern browser. No build step, no dependencies, no server needed.
 
-Or visit the live deployment: [**vedantkejariwal.github.io/AI-Chess-Solver**](https://vedantkejariwal.github.io/AI-Chess-Solver/)
+Or visit the live deployment: [**vedag812.github.io/AI-Chess-Solver**](https://vedag812.github.io/AI-Chess-Solver/)
 
 ## Tech
 
